@@ -98,7 +98,19 @@ def compile_italic_star(line):
     >>> compile_italic_star('*')
     '*'
     '''
-    return line
+    start = None
+    stop = None
+    for i in range(len(line)):
+        if line [i] == '*':
+            if start is None:
+                start = i
+            else:
+                stop = i
+    if start is not None and stop is not None:
+        italic = line[:start] + "<i>" + line[start+1:stop] + "</i>" + line[stop+1:]
+    else:
+        italic = line
+    return italic
 
 
 def compile_italic_underscore(line):
@@ -119,7 +131,19 @@ def compile_italic_underscore(line):
     >>> compile_italic_underscore('_')
     '_'
     '''
-    return line
+    start = None
+    stop = None
+    for i in range(len(line)):
+        if line [i] == '_':
+            if start is None:
+                start = i
+            else:
+                stop = i
+    if start is not None and stop is not None:
+        italic = line[:start] + "<i>" + line[start+1:stop] + "</i>" + line[stop+1:]
+    else:
+        italic = line
+    return italic
 
 
 def compile_strikethrough(line):
@@ -142,7 +166,20 @@ def compile_strikethrough(line):
     >>> compile_strikethrough('~~')
     '~~'
     '''
-    return line
+    start = None
+    stop = None
+    for i in range(len(line)-1):
+        if line [i] == '~':
+            if line [i+1] == '~':
+                if start is None:
+                    start = i
+                else:
+                    stop = i
+    if start is not None and stop is not None:
+        italic = line[:start] + "<ins>" + line[start+2:stop] + "</ins>" + line[stop+2:]
+    else:
+        italic = line
+    return italic
 
 
 def compile_bold_stars(line):
@@ -163,7 +200,20 @@ def compile_bold_stars(line):
     >>> compile_bold_stars('**')
     '**'
     '''
-    return line
+    start = None
+    stop = None
+    for i in range(len(line)-1):
+        if line [i] == '*':
+            if line [i+1] == '*':
+                if start is None:
+                    start = i
+                else:
+                    stop = i
+    if start is not None and stop is not None:
+        italic = line[:start] + "<b>" + line[start+2:stop] + "</b>" + line[stop+2:]
+    else:
+        italic = line
+    return italic
 
 
 def compile_bold_underscore(line):
@@ -184,7 +234,20 @@ def compile_bold_underscore(line):
     >>> compile_bold_underscore('__')
     '__'
     '''
-    return line
+    start = None
+    stop = None
+    for i in range(len(line)-1):
+        if line [i] == '_':
+            if line [i+1] == '_':
+                if start is None:
+                    start = i
+                else:
+                    stop = i
+    if start is not None and stop is not None:
+        italic = line[:start] + "<b>" + line[start+2:stop] + "</b>" + line[stop+2:]
+    else:
+        italic = line
+    return italic
 
 
 def compile_code_inline(line):
@@ -214,6 +277,20 @@ def compile_code_inline(line):
     >>> compile_code_inline('```python3')
     '```python3'
     '''
+    start = None
+    stop = None
+    for i in range(len(line)):
+        if line [i] == '`':
+            if start is None:
+                start = i
+            else:
+                stop = i
+    if line.find('```') == -1:
+            if start is not None and stop is not None:
+                new = line[start+1 : stop]
+                new = new.replace('<', '&lt;')
+                new = new.replace('>', '&gt;')
+                line = line[:start] + '<code>' + new + '</code>' + line[stop+1:]
     return line
 
 
@@ -234,6 +311,22 @@ def compile_links(line):
     >>> compile_links('this is wrong: [course webpage](https://github.com/mikeizbicki/cmc-csci040')
     'this is wrong: [course webpage](https://github.com/mikeizbicki/cmc-csci040'
     '''
+    start = line.find('[')
+    stop = line.find(']')
+    first = line.find('(')
+    last = line.find(')')
+    if start == -1 or stop == -1 or first ==-1 or last == -1:
+        return line
+    if first != stop+1:
+        return line
+    if first == stop+1:
+        parenthesis = line[first : last+1]
+        parenthesis = parenthesis.replace('(', '<a href="')
+        parenthesis = parenthesis.replace(')', '">')
+        squarebracket = line[start : stop+1]
+        squarebracket = squarebracket.replace('[','')
+        squarebracket = squarebracket.replace(']', '</a>')
+        line = line[:start] + parenthesis + squarebracket + line[last+1:]
     return line
 
 
@@ -253,6 +346,22 @@ def compile_images(line):
     >>> compile_images('This is an image of Mike Izbicki: ![Mike Izbicki](https://avatars1.githubusercontent.com/u/1052630?v=2&s=460)')
     'This is an image of Mike Izbicki: <img src="https://avatars1.githubusercontent.com/u/1052630?v=2&s=460" alt="Mike Izbicki" />'
     '''
+    start = line.find('![')
+    stop = line.find(']')
+    first = line.find('(')
+    last = line.find(')')
+    if start == -1 or stop == -1 or first ==-1 or last == -1:
+        return line
+    if first != stop+1:
+        return line
+    if first == stop+1:
+        parenthesis = line[first : last+1]
+        parenthesis = parenthesis.replace('(', '<img scr="')
+        parenthesis = parenthesis.replace(')', '" alt="')
+        squarebracket = line[start+1 : stop+1]
+        squarebracket = squarebracket.replace('[','')
+        squarebracket = squarebracket.replace(']', '" />')
+        line = line[:start] + parenthesis + squarebracket + line[last+1:]
     return line
 
 
