@@ -593,7 +593,9 @@ def minify(html):
     >>> minify('a\n\n\n\n\n\n\n\n\n\n\n\n\n\nb\n\n\n\n\n\n\n\n\n\n')
     'a b'
     '''
-    return html
+    alphabet=html.split()
+    abc=' '.join(alphabet)
+    return abc
 
 
 def convert_file(input_file, add_css):
