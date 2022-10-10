@@ -501,12 +501,22 @@ def compile_lines(text):
     lines = text.split('\n')
     new_lines = []
     in_paragraph = False
+    pretag = False
+
     for line in lines:
-        line = line.strip()
+        if pretag == False:
+            line = line.strip()
         if line=='':
-            if in_paragraph:
+            if in_paragraph == True and pretag == False:
                 line='</p>'
                 in_paragraph = False
+        elif line=='```':
+            if pretag:
+                line = '</pre>'
+                pretag = False
+            else:
+                line = '<pre>'
+                pretag = True
         else:
             if line[0] != '#' and not in_paragraph:
                 in_paragraph = True
