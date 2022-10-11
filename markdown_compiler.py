@@ -169,12 +169,11 @@ def compile_strikethrough(line):
     start = None
     stop = None
     for i in range(len(line)-1):
-        if line [i] == '~':
-            if line [i+1] == '~':
-                if start is None:
-                    start = i
-                else:
-                    stop = i
+        if line[i] == '~' and line[i+1] == '~':
+            if start is None:
+                start = i
+            else:
+                stop = i
     if start is not None and stop is not None:
         italic = line[:start] + "<ins>" + line[start+2:stop] + "</ins>" + line[stop+2:]
     else:
@@ -356,7 +355,7 @@ def compile_images(line):
         return line
     if first == stop+1:
         parenthesis = line[first : last+1]
-        parenthesis = parenthesis.replace('(', '<img scr="')
+        parenthesis = parenthesis.replace('(', '<img src="')
         parenthesis = parenthesis.replace(')', '" alt="')
         squarebracket = line[start+1 : stop+1]
         squarebracket = squarebracket.replace('[','')
@@ -504,20 +503,18 @@ def compile_lines(text):
     pretag = False
 
     for line in lines:
-        if pretag == False:
-            line = line.strip()
-        if line=='':
-            if in_paragraph == True and pretag == False:
+        if line== '':
+            if in_paragraph == True:
                 line='</p>'
                 in_paragraph = False
-        elif line=='```':
+        elif line[:3]=='```':
             if pretag:
                 line = '</pre>'
                 pretag = False
             else:
                 line = '<pre>'
                 pretag = True
-        else:
+        elif not pretag:
             if line[0] != '#' and not in_paragraph:
                 in_paragraph = True
                 line = '<p>\n'+line
@@ -533,7 +530,6 @@ def compile_lines(text):
         new_lines.append(line)
     new_text = '\n'.join(new_lines)
     return new_text
-
 
 def markdown_to_html(markdown, add_css):
     '''
