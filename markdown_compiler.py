@@ -72,9 +72,7 @@ def compile_headers(line):
     if line[:1] == '#':
         line = '<h1>' + line[1:]+'</h1>'
         return line
-    if line[:7] == '      #':
-        line = '      # this is not a header'
-        return line
+    return line
 
 
 def compile_italic_star(line):
@@ -168,6 +166,8 @@ def compile_strikethrough(line):
     '''
     start = None
     stop = None
+    if line == '':
+        return line
     for i in range(len(line)-1):
         if line[i] == '~' and line[i+1] == '~':
             if start is None:
@@ -503,8 +503,8 @@ def compile_lines(text):
     pretag = False
 
     for line in lines:
-        if line== '':
-            if in_paragraph == True:
+        if line=='':
+            if in_paragraph:
                 line='</p>'
                 in_paragraph = False
         elif line[:3]=='```':
